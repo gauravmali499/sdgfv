@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drink Cards</title>
+<style>
+  .card {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px;
+    width: 200px;
+    display: inline-block;
+  }
+  .card img {
+    max-width: 100%;
+    height: auto;
+  }
+</style>
+</head>
+<body>
+
+<select id="ingredientDropdown">
+  <option value="">Select Ingredient</option>
+  <option value="Watermelon">Watermelon</option>
+  <option value="Grapefruit Juice">Grapefruit Juice</option>
+  <option value="Mint">Mint</option>
+  <option value="Strawberries">Strawberries</option>
+  <option value="Lemon juice">Lemon juice</option>
+  <option value="Triple sec">Triple sec</option>
+  <option value="Ice">Ice</option>
+  <option value="Lime juice">Lime juice</option>
+  <option value="Tequila">Tequila</option>
+</select>
+
+<div id="drinkCards"></div>
+
+<script>
+// Define the colors based on drink categories
+const categoryColors = {
+  "Cocktail": "green",
+  "Ordinary Drink": "lightred",
+  "Other/Unknown": "lightyellow"
+};
+
+// Function to fetch data from API and render drink cards
+function fetchAndRenderDrinks() {
+  const ingredient = document.getElementById('ingredientDropdown').value.toLowerCase();
+  const apiUrl = 'https://res.cloudinary.com/des3si8bs/raw/upload/v1679912721/drinks_y1vudo.json';
+
+  fetch(apiUrl)
+    .then(response => response.json())
+    .then(data => {
+      const drinks = data.drinks.filter(drink => drink.strIngredient2.toLowerCase() === ingredient);
+      renderDrinkCards(drinks);
+    })
+    .catch(error => console.error('Error fetching data:', error));
+}
+
+// Function to render drink cards
+function renderDrinkCards(drinks) {
+  const drinkCardsContainer = document.getElementById('drinkCards');
+  drinkCardsContainer.innerHTML = '';
+
+  drinks.forEach(drink => {
+    const card = document.createElement('div');
+    card.classList.add('card');
+    
+    const category = drink.strCategory;
+    const categoryColor = categoryColors[category] || "white";
+    card.style.backgroundColor = categoryColor;
+
+    const img = document.createElement('img');
+    img.src = drink.strDrinkThumb;
+    img.alt = drink.strDrink;
+    card.appendChild(img);
+
+    const name = document.createElement('p');
+    name.textContent = drink.strDrink;
+    card.appendChild(name);
+
+    const instructions = document.createElement('p');
+    instructions.textContent = drink.strInstructions;
+    card.appendChild(instructions);
+
+    drinkCardsContainer.appendChild(card);
+  });
+}
+
+// Event listener for dropdown change
+document.getElementById('ingredientDropdown').addEventListener('change', fetchAndRenderDrinks);
+</script>
+
+</body>
+</html>
